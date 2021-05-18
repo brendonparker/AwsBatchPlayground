@@ -1,5 +1,5 @@
 {
-  "app": "dotnet run -p src/AwsBatchPlayground/AwsBatchPlayground.csproj",
+  "app": "dotnet run -p InfrastructureAsCode/InfrastructureAsCode.csproj",
   "context": {
     "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
     "@aws-cdk/core:enableStackNameDuplicates": "true",

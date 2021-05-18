@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwsBatchPlayground", "AwsBatchPlayground\AwsBatchPlayground.csproj", "{CB1F0036-77FD-458F-8E17-7B3EA73ADECB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureAsCode", "InfrastructureAsCode\InfrastructureAsCode.csproj", "{CB1F0036-77FD-458F-8E17-7B3EA73ADECB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
