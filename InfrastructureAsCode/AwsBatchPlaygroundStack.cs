@@ -36,7 +36,7 @@ namespace InfrastructureAsCode
                 State = "ENABLED",
                 JobQueueName = "SampleJobQueue",
                 Priority = 1,
-                ComputeEnvironmentOrder = new []
+                ComputeEnvironmentOrder = new[]
                 {
                     new Batch.CfnJobQueue.ComputeEnvironmentOrderProperty
                     {
@@ -55,6 +55,12 @@ namespace InfrastructureAsCode
             {
                 JobDefinitionName = "SampleJob",
                 ImageUri = imageAsset.ImageUri,
+                Command = new [] { "Ref::CustomerId", "Ref::JobKey" },
+                Parameters = new Dictionary<string, string>
+                {
+                    { "CustomerId", "" },
+                    { "JobKey", "" },
+                }
             });
         }
     }

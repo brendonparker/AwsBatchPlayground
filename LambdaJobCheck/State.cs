@@ -8,7 +8,6 @@ namespace LambdaJobCheck
     {
         public string CustomerId { get; set; }
         public string JobKey { get; set; }
-        public string Status { get; set; }
         public bool JobAlreadyRunning { get; set; }
     }
 }

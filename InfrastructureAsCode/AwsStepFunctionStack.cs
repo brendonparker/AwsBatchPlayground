@@ -102,7 +102,14 @@ namespace InfrastructureAsCode
                 JobName = "SampleJob",
                 JobDefinitionArn = Batch.JobDefinition.FromJobDefinitionName(this, "JobDefinition", "SampleJob").JobDefinitionArn,
                 JobQueueArn = $"arn:aws:batch:{Program.REGION}:{Program.ACCOUNT}:job-queue/SampleJobQueue",
-                ResultPath = SF.JsonPath.DISCARD
+                ResultPath = SF.JsonPath.DISCARD,
+                Payload = SF.TaskInput.FromObject(new Dictionary<string, object>
+                {
+                    // Upstream "JobAlreadyRunning" is getting added to the state as a bool.
+                    // This blowsup since apparently can only pass objects with strings as a payload :/
+                    { "CustomerId", SF.JsonPath.StringAt("$.CustomerId") },
+                    { "JobKey", SF.JsonPath.StringAt("$.JobKey") }
+                })
             });
 
             var cleanup = new SF.Tasks.LambdaInvoke(this, "Cleanup", new SF.Tasks.LambdaInvokeProps

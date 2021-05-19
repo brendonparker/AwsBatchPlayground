@@ -23,8 +23,10 @@ namespace InfrastructureAsCode.CustomConstructs
                 {
                     AttemptDurationSeconds = props.Timeout.ToSeconds()
                 },
+                Parameters = props.Parameters,
                 ContainerProperties = new Batch.CfnJobDefinition.ContainerPropertiesProperty
                 {
+                    Command = props.Command,
                     ExecutionRoleArn = (props.ExecutionRole ?? BuildJobRole(props.JobDefinitionName)).RoleArn,
                     Image = props.ImageUri,
                     NetworkConfiguration = props.AssignPublicIp ? new Batch.CfnJobDefinition.NetworkConfigurationProperty
@@ -69,5 +71,7 @@ namespace InfrastructureAsCode.CustomConstructs
         public decimal vCPU { get; set; } = 0.25M;
         public bool AssignPublicIp { get; set; } = true;
         public string ImageUri { get; set; }
+        public string[] Command { get; set; }
+        public Dictionary<string, string> Parameters { get; set; }
     }
 }
