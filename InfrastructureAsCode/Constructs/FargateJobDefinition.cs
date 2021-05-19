@@ -5,7 +5,7 @@ using System.Text;
 using Batch = Amazon.CDK.AWS.Batch;
 using IAM = Amazon.CDK.AWS.IAM;
 
-namespace AwsBatchPlayground.CustomConstructs
+namespace InfrastructureAsCode.CustomConstructs
 {
     internal class FargateJobDefinition : Construct
     {

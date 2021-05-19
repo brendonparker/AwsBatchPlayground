@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AwsBatchPlayground
+namespace InfrastructureAsCode
 {
     sealed class Program
     {
@@ -13,14 +13,22 @@ namespace AwsBatchPlayground
         public static void Main(string[] args)
         {
             var app = new App();
+            var env = new Amazon.CDK.Environment
+            {
+                Account = ACCOUNT,
+                Region = REGION
+            };
+
             new AwsBatchPlaygroundStack(app, "AwsBatchPlaygroundStack", new StackProps
             {
-                Env = new Amazon.CDK.Environment
-                {
-                    Account = ACCOUNT,
-                    Region = REGION
-                }
+                Env = env
             });
+
+            new AwsStepFunctionStack(app, "AwsStepFunctionStack", new StackProps
+            {
+                Env = env
+            });
+
             app.Synth();
         }
     }
