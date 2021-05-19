@@ -19,8 +19,11 @@ namespace DownloadDataBatchApp
                 System.Environment.WorkingSet
             }));
             WriteLine("Starting...");
+            WriteLine("Waiting for 10 seconds");
             Thread.Sleep(10000);
-            WriteLine("Hello World!");
+            WriteLine("Doing more work...");
+            Thread.Sleep(5000);
+            WriteLine("Done!");
         }
     }
 }
