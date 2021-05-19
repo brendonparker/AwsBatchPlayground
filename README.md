@@ -16,5 +16,5 @@ It uses the [.NET Core CLI](https://docs.microsoft.com/dotnet/articles/core/) to
 Can then run this aws cli command to queue up jobs. Can run this several times.
 
 ```
-aws batch submit-job --job-name Job001 --job-definition SampleJobDefinition --job-queue SampleJobQueue
+aws batch submit-job --job-name Job001 --job-definition SampleJob --job-queue SampleJobQueue
 ```
