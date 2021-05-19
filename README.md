@@ -1,6 +1,6 @@
 # Sample C# application using AWS Batch
 
-This is a demo app of using AWS Batch. It includes a sample CDK project to stand up the bits in AWS.
+This is a demo app of using AWS Batch with fargate containers to process the jobs. It includes a sample CDK project to stand up the bits in AWS.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
