@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Batch = Amazon.CDK.AWS.Batch;
 using Lambda = Amazon.CDK.AWS.Lambda;
 using DDB = Amazon.CDK.AWS.DynamoDB;
 using Amazon.CDK.AWS.IAM;
+using SF = Amazon.CDK.AWS.StepFunctions;
 
 namespace InfrastructureAsCode
 {
@@ -14,29 +16,6 @@ namespace InfrastructureAsCode
 
         public AwsStepFunctionStack(Constructs.Construct scope = null, string id = null, IStackProps props = null) : base(scope, id, props)
         {
-            var lambdaJobCheck = new Lambda.Function(this, "LambdaJobCheck", new Lambda.FunctionProps
-            {
-                FunctionName = "JobCheck",
-                Runtime = Lambda.Runtime.DOTNET_CORE_3_1,
-                MemorySize = 1024,
-                Code = Lambda.Code.FromAsset("./LambdaSource/JobCheck"),
-                Handler = "LambdaJobCheck::LambdaJobCheck.Function::FunctionHandlerAsync",
-                Timeout = Duration.Seconds(30),
-                Environment = new Dictionary<string, string>
-                {
-                    { "TABLE_NAME", TABLE_NAME }
-                },
-                Role = new Role(this, "LambdaJobCheckRole", new RoleProps
-                {
-                    RoleName = "LambdaJobCheckRole",
-                    AssumedBy = new ServicePrincipal("lambda.amazonaws.com"),
-                    ManagedPolicies = new [] 
-                    { 
-                        ManagedPolicy.FromManagedPolicyArn(this, "AWSLambdaDynamoDBExecutionRole", "arn:aws:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole") 
-                    }
-                })
-            });
-
             var table = new DDB.Table(this, "JobTable", new DDB.TableProps
             {
                 PartitionKey = new DDB.Attribute
@@ -45,6 +24,105 @@ namespace InfrastructureAsCode
                     Type = DDB.AttributeType.STRING
                 },
                 TableName = TABLE_NAME
+            });
+
+            var dynamoAccessPolicyDocument = new PolicyDocument(new PolicyDocumentProps
+            {
+                Statements = new[]
+                {
+                    new PolicyStatement(new PolicyStatementProps
+                    {
+                        Effect = Effect.ALLOW,
+                        Actions = new []
+                        {
+                            "dynamodb:DescribeTable",
+                            "dynamodb:GetItem",
+                            "dynamodb:Query",
+                            "dynamodb:Scan",
+                            "dynamodb:PutItem",
+                            "dynamodb:DeleteItem",
+                        },
+                        Resources = new [] { table.TableArn }
+                    })
+                }
+            });
+
+            var lambdaRole = new Role(this, "LambdaRole", new RoleProps
+            {
+                RoleName = "StepFunctionRole",
+                AssumedBy = new ServicePrincipal("lambda.amazonaws.com"),
+                ManagedPolicies = new[]
+                        {
+                        ManagedPolicy.FromManagedPolicyArn(this, "AWSLambdaDynamoDBExecutionRole", "arn:aws:iam::aws:policy/service-role/AWSLambdaDynamoDBExecutionRole")
+                    },
+                InlinePolicies = new Dictionary<string, PolicyDocument>
+                    {
+                        { "DynamoDBStuff", dynamoAccessPolicyDocument }
+                    }
+            });
+
+            var lambdaDuplicateCheck = new Lambda.Function(this, "LambdaDuplicateCheck", new Lambda.FunctionProps
+            {
+                FunctionName = "Step-DuplicateCheck",
+                Runtime = Lambda.Runtime.DOTNET_CORE_3_1,
+                MemorySize = 1024,
+                Code = Lambda.Code.FromAsset("./LambdaJobCheck/bin/Release/netcoreapp3.1/linux-x64"),
+                Handler = "LambdaJobCheck::LambdaJobCheck.Function::CheckForDuplicateJobAsync",
+                Timeout = Duration.Seconds(30),
+                Environment = new Dictionary<string, string>
+                {
+                    { "TABLE_NAME", TABLE_NAME }
+                },
+                Role = lambdaRole
+            });
+
+            var lambdaCleanup = new Lambda.Function(this, "LambdaCleanup", new Lambda.FunctionProps
+            {
+                FunctionName = "Step-Cleanup",
+                Runtime = Lambda.Runtime.DOTNET_CORE_3_1,
+                MemorySize = 1024,
+                Code = Lambda.Code.FromAsset("./LambdaJobCheck/bin/Release/netcoreapp3.1/linux-x64"),
+                Handler = "LambdaJobCheck::LambdaJobCheck.Function::CleanupJobAsync",
+                Timeout = Duration.Seconds(30),
+                Environment = new Dictionary<string, string>
+                {
+                    { "TABLE_NAME", TABLE_NAME }
+                },
+                Role = lambdaRole
+            });
+
+            var duplicateCheck = new SF.Tasks.LambdaInvoke(this, "DuplicateCheck", new SF.Tasks.LambdaInvokeProps
+            {
+                LambdaFunction = lambdaDuplicateCheck,
+                OutputPath = "$.Payload"
+            });
+
+            var startJob = new SF.Tasks.BatchSubmitJob(this, "SubmitJob", new SF.Tasks.BatchSubmitJobProps
+            {
+                JobName = "SampleJob",
+                JobDefinitionArn = Batch.JobDefinition.FromJobDefinitionName(this, "JobDefinition", "SampleJob").JobDefinitionArn,
+                JobQueueArn = $"arn:aws:batch:{Program.REGION}:{Program.ACCOUNT}:job-queue/SampleJobQueue",
+                ResultPath = SF.JsonPath.DISCARD
+            });
+
+            var cleanup = new SF.Tasks.LambdaInvoke(this, "Cleanup", new SF.Tasks.LambdaInvokeProps
+            {
+                LambdaFunction = lambdaCleanup
+            });
+
+            var stateAlreadyRunning = new SF.Succeed(this, "JobAlreadyRunning");
+
+            var definition = duplicateCheck
+                .Next(new SF.Choice(this, "JobRunningChoice")
+                    .When(SF.Condition.BooleanEquals("$.JobAlreadyRunning", true), stateAlreadyRunning)
+                    .When(SF.Condition.BooleanEquals("$.JobAlreadyRunning", false), startJob.Next(cleanup)));
+
+            new SF.StateMachine(this, "StateMachine", new SF.StateMachineProps
+            {
+                StateMachineType = SF.StateMachineType.STANDARD,
+                StateMachineName = "SampleStateMachine",
+                Timeout = Duration.Hours(1),
+                Definition = definition
             });
         }
     }

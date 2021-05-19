@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
 using Amazon.Lambda.Core;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
@@ -25,7 +26,7 @@ namespace LambdaJobCheck
             table = Table.LoadTable(ddbClient, TABLE_NAME);
         }
 
-        public async Task FunctionHandler(State state, ILambdaContext context)
+        public async Task<State> CheckForDuplicateJobAsync(State state, ILambdaContext context)
         {
             var document = new Document();
             document[FIELD_JOB_KEY] = state.JobKey;
@@ -39,16 +40,31 @@ namespace LambdaJobCheck
                     {
                         ExpressionStatement = "attribute_not_exists(#k)",
                         ExpressionAttributeNames = new Dictionary<string, string>
-                    {
-                        { "#k", FIELD_JOB_KEY }
-                    }
+                        {
+                            { "#k", FIELD_JOB_KEY }
+                        }
                     }
                 });
             }
-            catch (Exception ex)
+            catch (ConditionalCheckFailedException ex)
             {
-
+                state.JobAlreadyRunning = true;
             }
+            return state;
+        }
+
+        public async Task<State> CleanupJobAsync(State state, ILambdaContext context)
+        {
+            await ddbClient.DeleteItemAsync(new DeleteItemRequest
+            {
+                TableName = TABLE_NAME,
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    { FIELD_JOB_KEY, new AttributeValue(state.JobKey) }
+                }
+            });
+
+            return state;
         }
     }
 }

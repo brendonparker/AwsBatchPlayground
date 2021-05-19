@@ -14,6 +14,7 @@
     <PackageReference Include="Amazon.CDK.AWS.DynamoDB" Version="1.103.0" />
     <PackageReference Include="Amazon.CDK.AWS.Lambda" Version="1.103.0" />
     <PackageReference Include="Amazon.CDK.AWS.StepFunctions" Version="1.103.0" />
+    <PackageReference Include="Amazon.CDK.AWS.StepFunctions.Tasks" Version="1.103.0" />
 
     <!-- jsii Roslyn analyzers (un-comment to obtain compile-time checks for missing required props
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />
