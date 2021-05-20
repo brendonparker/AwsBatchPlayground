@@ -91,10 +91,26 @@ namespace InfrastructureAsCode
                 Role = lambdaRole
             });
 
-            var duplicateCheck = new SF.Tasks.LambdaInvoke(this, "DuplicateCheck", new SF.Tasks.LambdaInvokeProps
+            //var duplicateCheck = new SF.Tasks.LambdaInvoke(this, "DuplicateCheck", new SF.Tasks.LambdaInvokeProps
+            //{
+            //    LambdaFunction = lambdaDuplicateCheck,
+            //    OutputPath = "$.Payload"
+            //});
+
+            var duplicateCheck = new SF.Tasks.DynamoPutItem(this, "DynamoDuplicateCheck", new SF.Tasks.DynamoPutItemProps
             {
-                LambdaFunction = lambdaDuplicateCheck,
-                OutputPath = "$.Payload"
+                Table = table,
+                Item = new Dictionary<string, SF.Tasks.DynamoAttributeValue>
+                {
+                    { "JobKey", SF.Tasks.DynamoAttributeValue.FromString(SF.JsonPath.StringAt("$.JobKey")) },
+                    { "CustomerId", SF.Tasks.DynamoAttributeValue.FromString(SF.JsonPath.StringAt("$.CustomerId")) }
+                },
+                OutputPath = "$.Payload",
+                ConditionExpression = "attribute_not_exists(#k)",
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    { "#k", "JobKey" }
+                }
             });
 
             var startJob = new SF.Tasks.BatchSubmitJob(this, "SubmitJob", new SF.Tasks.BatchSubmitJobProps
