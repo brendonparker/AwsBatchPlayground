@@ -5,12 +5,15 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfrastructureAsCode", "InfrastructureAsCode\InfrastructureAsCode.csproj", "{CB1F0036-77FD-458F-8E17-7B3EA73ADECB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadDataBatchApp", "DownloadDataBatchApp\DownloadDataBatchApp.csproj", "{2A701A9B-E5E1-490B-BBBB-2CE322F4E9A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DownloadDataBatchApp", "DownloadDataBatchApp\DownloadDataBatchApp.csproj", "{2A701A9B-E5E1-490B-BBBB-2CE322F4E9A8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{863BECA7-0F31-4BD9-AB0E-B85C241C52B1}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaJobCheck", "LambdaJobCheck\LambdaJobCheck.csproj", "{20193B7D-035D-49CB-B673-094D0D34D161}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +49,18 @@ Global
 		{2A701A9B-E5E1-490B-BBBB-2CE322F4E9A8}.Release|x64.Build.0 = Release|Any CPU
 		{2A701A9B-E5E1-490B-BBBB-2CE322F4E9A8}.Release|x86.ActiveCfg = Release|Any CPU
 		{2A701A9B-E5E1-490B-BBBB-2CE322F4E9A8}.Release|x86.Build.0 = Release|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Debug|x64.Build.0 = Debug|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Debug|x86.Build.0 = Debug|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Release|x64.ActiveCfg = Release|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Release|x64.Build.0 = Release|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Release|x86.ActiveCfg = Release|Any CPU
+		{20193B7D-035D-49CB-B673-094D0D34D161}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,12 +1,12 @@
 using Amazon.CDK;
 using Amazon.CDK.AWS.EC2;
 using Amazon.CDK.AWS.Ecr.Assets;
-using AwsBatchPlayground.CustomConstructs;
+using InfrastructureAsCode.CustomConstructs;
 using System.Collections.Generic;
 using System.Linq;
 using Batch = Amazon.CDK.AWS.Batch;
 
-namespace AwsBatchPlayground
+namespace InfrastructureAsCode
 {
     public class AwsBatchPlaygroundStack : Stack
     {
@@ -36,7 +36,7 @@ namespace AwsBatchPlayground
                 State = "ENABLED",
                 JobQueueName = "SampleJobQueue",
                 Priority = 1,
-                ComputeEnvironmentOrder = new []
+                ComputeEnvironmentOrder = new[]
                 {
                     new Batch.CfnJobQueue.ComputeEnvironmentOrderProperty
                     {
@@ -54,7 +54,13 @@ namespace AwsBatchPlayground
             var jobDefinition = new FargateJobDefinition(this, "FargateJobDef", new FargateJobDefinitionProps
             {
                 JobDefinitionName = "SampleJob",
-                ImageUri = imageAsset.ImageUri
+                ImageUri = imageAsset.ImageUri,
+                Command = new [] { "Ref::CustomerId", "Ref::JobKey" },
+                Parameters = new Dictionary<string, string>
+                {
+                    { "CustomerId", "" },
+                    { "JobKey", "" },
+                }
             });
         }
     }

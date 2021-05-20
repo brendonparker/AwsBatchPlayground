@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "InfrastructureAsCode": {
+      "commandName": "Project",
+      "environmentVariables": {}
+    }
+  }
+}

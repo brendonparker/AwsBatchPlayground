@@ -5,7 +5,7 @@ using System.Text;
 using Batch = Amazon.CDK.AWS.Batch;
 using IAM = Amazon.CDK.AWS.IAM;
 
-namespace AwsBatchPlayground.CustomConstructs
+namespace InfrastructureAsCode.CustomConstructs
 {
     internal class FargateJobDefinition : Construct
     {
@@ -23,8 +23,10 @@ namespace AwsBatchPlayground.CustomConstructs
                 {
                     AttemptDurationSeconds = props.Timeout.ToSeconds()
                 },
+                Parameters = props.Parameters,
                 ContainerProperties = new Batch.CfnJobDefinition.ContainerPropertiesProperty
                 {
+                    Command = props.Command,
                     ExecutionRoleArn = (props.ExecutionRole ?? BuildJobRole(props.JobDefinitionName)).RoleArn,
                     Image = props.ImageUri,
                     NetworkConfiguration = props.AssignPublicIp ? new Batch.CfnJobDefinition.NetworkConfigurationProperty
@@ -69,5 +71,7 @@ namespace AwsBatchPlayground.CustomConstructs
         public decimal vCPU { get; set; } = 0.25M;
         public bool AssignPublicIp { get; set; } = true;
         public string ImageUri { get; set; }
+        public string[] Command { get; set; }
+        public Dictionary<string, string> Parameters { get; set; }
     }
 }
